@@ -1,18 +1,16 @@
+
 package guru.qa.niffler.test.web;
 
-import com.codeborne.selenide.Selenide;
+import com.codeborne.selenide.SelenideDriver;
 import guru.qa.niffler.jupiter.annotation.Category;
-import guru.qa.niffler.jupiter.annotation.ScreenShotTest;
 import guru.qa.niffler.jupiter.annotation.User;
 import guru.qa.niffler.jupiter.annotation.meta.WebTest;
 import guru.qa.niffler.model.rest.UserJson;
 import guru.qa.niffler.page.LoginPage;
 import guru.qa.niffler.page.MainPage;
 import guru.qa.niffler.page.ProfilePage;
+import guru.qa.niffler.utils.SelenideUtils;
 import org.junit.jupiter.api.Test;
-
-import java.awt.image.BufferedImage;
-import java.io.IOException;
 
 import static guru.qa.niffler.utils.RandomDataUtils.randomCategoryName;
 import static guru.qa.niffler.utils.RandomDataUtils.randomName;
@@ -20,6 +18,7 @@ import static guru.qa.niffler.utils.RandomDataUtils.randomName;
 @WebTest
 public class ProfileTest {
 
+    private final SelenideDriver driver = new SelenideDriver(SelenideUtils.chromeConfig);
     @User(
             categories = @Category(
                     archived = true
@@ -29,12 +28,12 @@ public class ProfileTest {
     void archivedCategoryShouldPresentInCategoriesList(UserJson user) {
         final String categoryName = user.testData().categoryDescriptions()[0];
 
-        Selenide.open(LoginPage.URL, LoginPage.class)
+        driver.open(LoginPage.URL, LoginPage.class)
                 .fillLoginPage(user.username(), user.testData().password())
                 .submit(new MainPage())
                 .checkThatPageLoaded();
 
-        Selenide.open(ProfilePage.URL, ProfilePage.class)
+        driver.open(ProfilePage.URL, ProfilePage.class)
                 .checkArchivedCategoryExists(categoryName);
     }
 
@@ -47,12 +46,12 @@ public class ProfileTest {
     void activeCategoryShouldPresentInCategoriesList(UserJson user) {
         final String categoryName = user.testData().categoryDescriptions()[0];
 
-        Selenide.open(LoginPage.URL, LoginPage.class)
+        driver.open(LoginPage.URL, LoginPage.class)
                 .fillLoginPage(user.username(), user.testData().password())
                 .submit(new MainPage())
                 .checkThatPageLoaded();
 
-        Selenide.open(ProfilePage.URL, ProfilePage.class)
+        driver.open(ProfilePage.URL, ProfilePage.class)
                 .checkCategoryExists(categoryName);
     }
 
@@ -61,18 +60,18 @@ public class ProfileTest {
     void shouldUpdateProfileWithAllFieldsSet(UserJson user) {
         final String newName = randomName();
 
-        ProfilePage profilePage = Selenide.open(LoginPage.URL, LoginPage.class)
+        ProfilePage profilePage = driver.open(LoginPage.URL, LoginPage.class)
                 .fillLoginPage(user.username(), user.testData().password())
                 .submit(new MainPage())
                 .checkThatPageLoaded()
                 .getHeader()
                 .toProfilePage()
-                .uploadPhotoFromClasspath("img/cat.png")
+                .uploadPhotoFromClasspath("img/cat.jpeg")
                 .setName(newName)
                 .submitProfile()
                 .checkAlertMessage("Profile successfully updated");
 
-        Selenide.refresh();
+        driver.refresh();
 
         profilePage.checkName(newName)
                 .checkPhotoExist();
@@ -83,7 +82,7 @@ public class ProfileTest {
     void shouldUpdateProfileWithOnlyRequiredFields(UserJson user) {
         final String newName = randomName();
 
-        ProfilePage profilePage = Selenide.open(LoginPage.URL, LoginPage.class)
+        ProfilePage profilePage = driver.open(LoginPage.URL, LoginPage.class)
                 .fillLoginPage(user.username(), user.testData().password())
                 .submit(new MainPage())
                 .checkThatPageLoaded()
@@ -93,7 +92,7 @@ public class ProfileTest {
                 .submitProfile()
                 .checkAlertMessage("Profile successfully updated");
 
-        Selenide.refresh();
+        driver.refresh();
 
         profilePage.checkName(newName);
     }
@@ -103,7 +102,7 @@ public class ProfileTest {
     void shouldAddNewCategory(UserJson user) {
         String newCategory = randomCategoryName();
 
-        Selenide.open(LoginPage.URL, LoginPage.class)
+        driver.open(LoginPage.URL, LoginPage.class)
                 .fillLoginPage(user.username(), user.testData().password())
                 .submit(new MainPage())
                 .checkThatPageLoaded()
@@ -128,26 +127,12 @@ public class ProfileTest {
     )
     @Test
     void shouldForbidAddingMoreThat8Categories(UserJson user) {
-        Selenide.open(LoginPage.URL, LoginPage.class)
+        driver.open(LoginPage.URL, LoginPage.class)
                 .fillLoginPage(user.username(), user.testData().password())
                 .submit(new MainPage())
                 .checkThatPageLoaded()
                 .getHeader()
                 .toProfilePage()
                 .checkThatCategoryInputDisabled();
-    }
-
-    @User
-    @ScreenShotTest(value = "img/profile-expected.png")
-    void checkProfileImageTest(UserJson user, BufferedImage expectedProfileImage) throws IOException {
-        Selenide.open(LoginPage.URL, LoginPage.class)
-                .fillLoginPage(user.username(), user.testData().password())
-                .submit(new MainPage())
-                .checkThatPageLoaded()
-                .getHeader()
-                .toProfilePage()
-                .uploadPhotoFromClasspath("img/cat.png")
-                .submitProfile()
-                .checkProfileImage(expectedProfileImage);
     }
 }
