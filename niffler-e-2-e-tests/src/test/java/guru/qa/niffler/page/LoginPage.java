@@ -19,6 +19,7 @@ public class LoginPage extends BasePage<LoginPage> {
     private final SelenideElement submitButton;
     private final SelenideElement registerButton;
     private final SelenideElement errorContainer;
+
     public LoginPage(SelenideDriver driver) {
         super(driver);
         this.usernameInput = driver.$("input[name='username']");
@@ -27,6 +28,7 @@ public class LoginPage extends BasePage<LoginPage> {
         this.registerButton = driver.$("a[href='/register']");
         this.errorContainer = driver.$(".form__error");
     }
+
     public LoginPage() {
         this.usernameInput = Selenide.$("input[name='username']");
         this.passwordInput = Selenide.$("input[name='password']");
