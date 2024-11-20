@@ -1,5 +1,4 @@
 package guru.qa.niffler.jupiter.extension;
-
 import guru.qa.niffler.config.Config;
 import guru.qa.niffler.data.jdbc.Connections;
 import guru.qa.niffler.data.jdbc.DataSources;
@@ -16,7 +15,7 @@ public class DatabasesExtension implements SuiteExtension {
     @Override
     public void beforeSuite(ExtensionContext context) {
         // Очищаем все таблицы перед началом тестов
-        clearDatabaseTables();
+//    clearDatabaseTables();
     }
 
     @Override
