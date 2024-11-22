@@ -1,5 +1,4 @@
 package guru.qa.niffler.service.impl;
-
 import guru.qa.niffler.api.AuthApi;
 import guru.qa.niffler.api.UserdataApi;
 import guru.qa.niffler.api.core.RestClient.EmptyClient;
@@ -11,30 +10,24 @@ import guru.qa.niffler.service.UsersClient;
 import io.qameta.allure.Step;
 import org.jetbrains.annotations.NotNull;
 import retrofit2.Response;
-
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
-
 import static guru.qa.niffler.utils.RandomDataUtils.randomUsername;
 import static java.util.Objects.requireNonNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-
 @ParametersAreNonnullByDefault
 public class UsersApiClient implements UsersClient {
-
     private static final Config CFG = Config.getInstance();
     private static final String defaultPassword = "12345";
-
     private final AuthApi authApi = new EmptyClient(CFG.authUrl()).create(AuthApi.class);
     private final UserdataApi userdataApi = new EmptyClient(CFG.userdataUrl()).create(UserdataApi.class);
-
     @NotNull
     @Override
-    @Step("Create user using API")
+    @Step("Crete user using API")
     public UserJson createUser(String username, String password) {
         try {
             authApi.requestRegisterForm().execute();
@@ -54,7 +47,38 @@ public class UsersApiClient implements UsersClient {
             throw new RuntimeException(e);
         }
     }
+    @Step("Retrieve all users using API")
+    @Nonnull
+    public List<UserJson> allUsers(@Nonnull String username, @Nullable String searchQuery) {
+        final Response<List<UserJson>> response;
+        try {
+            response = userdataApi.allUsers(username, searchQuery)
+                    .execute();
+        } catch (IOException e) {
+            throw new AssertionError(e);
+        }
+        assertEquals(200, response.code());
+        return response.body() != null
+                ? response.body()
+                : Collections.emptyList();
+    }
 
+    @Step("Retrieve all friends using API")
+    @Nonnull
+    public List<UserJson> friends(@Nonnull String username, @Nullable String searchQuery) {
+        final Response<List<UserJson>> response;
+        try {
+            response = userdataApi.friends(username, searchQuery).execute();
+        } catch (IOException e) {
+            throw new AssertionError(e);
+        }
+        assertEquals(200, response.code());
+        return response.body() != null
+                ? response.body()
+                : Collections.emptyList();
+    }
+
+    @Step("Add income invitations using API")
     @Override
     public void addIncomeInvitation(UserJson targetUser, int count) {
         if (count > 0) {
@@ -64,7 +88,6 @@ public class UsersApiClient implements UsersClient {
                 final UserJson newUser;
                 try {
                     newUser = createUser(username, defaultPassword);
-
                     response = userdataApi.sendInvitation(
                             newUser.username(),
                             targetUser.username()
@@ -73,14 +96,13 @@ public class UsersApiClient implements UsersClient {
                     throw new AssertionError(e);
                 }
                 assertEquals(200, response.code());
-
                 targetUser.testData()
                         .incomeInvitations()
                         .add(newUser);
             }
         }
     }
-
+    @Step("Add outcome invitations using API")
     @Override
     public void addOutcomeInvitation(UserJson targetUser, int count) {
         if (count > 0) {
@@ -90,7 +112,6 @@ public class UsersApiClient implements UsersClient {
                 final UserJson newUser;
                 try {
                     newUser = createUser(username, defaultPassword);
-
                     response = userdataApi.sendInvitation(
                             targetUser.username(),
                             newUser.username()
@@ -99,14 +120,13 @@ public class UsersApiClient implements UsersClient {
                     throw new RuntimeException(e);
                 }
                 assertEquals(200, response.code());
-
                 targetUser.testData()
                         .outcomeInvitations()
                         .add(newUser);
             }
         }
     }
-
+    @Step("Add friends using API")
     @Override
     public void addFriend(UserJson targetUser, int count) {
         if (count > 0) {
@@ -126,26 +146,10 @@ public class UsersApiClient implements UsersClient {
                     throw new RuntimeException(e);
                 }
                 assertEquals(200, response.code());
-
                 targetUser.testData()
                         .friends()
                         .add(response.body());
             }
         }
-    }
-
-    @Nonnull
-    public List<UserJson> allUsers(@Nonnull String username, @Nullable String searchQuery) {
-        final Response<List<UserJson>> response;
-        try {
-            response = userdataApi.allUsers(username, searchQuery)
-                    .execute();
-        } catch (IOException e) {
-            throw new AssertionError(e);
-        }
-        assertEquals(200, response.code());
-        return response.body() != null
-                ? response.body()
-                : Collections.emptyList();
     }
 }
