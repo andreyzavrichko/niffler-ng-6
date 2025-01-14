@@ -12,13 +12,17 @@ import guru.qa.niffler.page.component.StatComponent;
 import guru.qa.niffler.utils.RandomDataUtils;
 import guru.qa.niffler.utils.ScreenDiffResult;
 import org.junit.jupiter.api.Test;
+
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.Date;
 import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.assertFalse;
+
 @WebTest
 public class SpendingWebTest {
+
     @User(
             spendings = @Spending(
                     category = "Обучение",
@@ -57,6 +61,7 @@ public class SpendingWebTest {
                 .setNewSpendingDescription(description)
                 .saveSpending()
                 .checkAlertMessage("New spending is successfully created");
+
         new MainPage().getSpendingTable()
                 .checkTableContains(description);
     }
@@ -86,6 +91,7 @@ public class SpendingWebTest {
                 .saveSpending()
                 .checkFormErrorMessage("Amount has to be not less then 0.01");
     }
+
     @User(
             spendings = @Spending(
                     category = "Обучение",
@@ -101,6 +107,8 @@ public class SpendingWebTest {
                 .deleteSpending("Обучение Advanced 2.0")
                 .checkTableSize(0);
     }
+
+
     @User(
             spendings = @Spending(
                     category = "Обучение",
@@ -121,6 +129,7 @@ public class SpendingWebTest {
         ), "Screen comparison failure");
         statComponent.checkBubblesColor(Color.yellow);
     }
+
     @User(
             spendings = @Spending(
                     category = "Обучение",
@@ -138,11 +147,8 @@ public class SpendingWebTest {
         Bubble bubble = new Bubble(Color.yellow, "Обучение 79990 ₽");
         statComponent.checkBubbles(bubble);
     }
+
     @User(
-            categories = {
-                    @Category(name = "Обучение"),
-                    @Category(name = "Развлечения")
-            },
             spendings = {
                     @Spending(
                             category = "Обучение",
@@ -167,11 +173,8 @@ public class SpendingWebTest {
         Bubble bubble2 = new Bubble(Color.green, "Развлечения 100 ₽");
         statComponent.checkBubblesInAnyOrder(bubble2, bubble1);
     }
+
     @User(
-            categories = {
-                    @Category(name = "Обучение"),
-                    @Category(name = "Развлечения")
-            },
             spendings = {
                     @Spending(
                             category = "Обучение",
@@ -195,11 +198,8 @@ public class SpendingWebTest {
         Bubble bubble = new Bubble(Color.yellow, "Обучение 1000 ₽");
         statComponent.checkBubblesContains(bubble);
     }
+
     @User(
-            categories = {
-                    @Category(name = "Обучение"),
-                    @Category(name = "Развлечения")
-            },
             spendings = {
                     @Spending(
                             category = "Обучение",

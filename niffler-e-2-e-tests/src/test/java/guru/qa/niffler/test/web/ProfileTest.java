@@ -1,4 +1,5 @@
 package guru.qa.niffler.test.web;
+
 import com.codeborne.selenide.Selenide;
 import guru.qa.niffler.jupiter.annotation.ApiLogin;
 import guru.qa.niffler.jupiter.annotation.Category;
@@ -6,16 +7,18 @@ import guru.qa.niffler.jupiter.annotation.ScreenShotTest;
 import guru.qa.niffler.jupiter.annotation.User;
 import guru.qa.niffler.jupiter.annotation.meta.WebTest;
 import guru.qa.niffler.model.rest.UserJson;
-import guru.qa.niffler.page.LoginPage;
-import guru.qa.niffler.page.MainPage;
 import guru.qa.niffler.page.ProfilePage;
 import org.junit.jupiter.api.Test;
+
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+
 import static guru.qa.niffler.utils.RandomDataUtils.randomCategoryName;
 import static guru.qa.niffler.utils.RandomDataUtils.randomName;
+
 @WebTest
 public class ProfileTest {
+
     @User(
             categories = @Category(
                     archived = true
@@ -28,6 +31,7 @@ public class ProfileTest {
         Selenide.open(ProfilePage.URL, ProfilePage.class)
                 .checkArchivedCategoryExists(categoryName);
     }
+
     @User(
             categories = @Category(
                     archived = false
@@ -40,6 +44,7 @@ public class ProfileTest {
         Selenide.open(ProfilePage.URL, ProfilePage.class)
                 .checkCategoryExists(categoryName);
     }
+
     @User
     @ApiLogin
     @Test
@@ -78,6 +83,7 @@ public class ProfileTest {
                 .checkAlertMessage("You've added new category:")
                 .checkCategoryExists(newCategory);
     }
+
     @User(
             categories = {
                     @Category(name = "Food"),

@@ -1,4 +1,5 @@
 package guru.qa.niffler.service.impl;
+
 import guru.qa.niffler.api.SpendApi;
 import guru.qa.niffler.api.core.RestClient.EmptyClient;
 import guru.qa.niffler.config.Config;
@@ -15,10 +16,13 @@ import java.util.List;
 
 import static java.util.Objects.requireNonNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+
 @ParametersAreNonnullByDefault
 public class SpendApiClient implements SpendClient {
+
     private static final Config CFG = Config.getInstance();
     private final SpendApi spendApi = new EmptyClient(CFG.spendUrl()).create(SpendApi.class);
+
     @Override
     @Nonnull
     public SpendJson createSpend(SpendJson spend) {
@@ -32,6 +36,7 @@ public class SpendApiClient implements SpendClient {
         assertEquals(201, response.code());
         return requireNonNull(response.body());
     }
+
     @Override
     @Nonnull
     public CategoryJson createCategory(CategoryJson category) {

@@ -1,6 +1,8 @@
 package guru.qa.niffler.service;
+
 import guru.qa.niffler.model.rest.CategoryJson;
 import guru.qa.niffler.model.rest.SpendJson;
+
 import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
 

@@ -1,7 +1,9 @@
 package guru.qa.niffler.test.web;
 
 import com.codeborne.selenide.Selenide;
+import guru.qa.niffler.jupiter.annotation.User;
 import guru.qa.niffler.jupiter.annotation.meta.WebTest;
+import guru.qa.niffler.model.rest.UserJson;
 import guru.qa.niffler.page.LoginPage;
 import guru.qa.niffler.page.MainPage;
 import org.junit.jupiter.api.Test;
@@ -24,16 +26,14 @@ public class RegistrationTest {
                 .checkThatPageLoaded();
     }
 
+    @User
     @Test
-    void shouldNotRegisterUserWithExistingUsername() {
-        String existingUsername = "duck";
-        String password = "12345";
-
+    void shouldNotRegisterUserWithExistingUsername(UserJson user) {
         LoginPage loginPage = Selenide.open(LoginPage.URL, LoginPage.class);
         loginPage.doRegister()
-                .fillRegisterPage(existingUsername, password, password)
+                .fillRegisterPage(user.username(), user.testData().password(), user.testData().password())
                 .errorSubmit();
-        loginPage.checkError("Username `" + existingUsername + "` already exists");
+        loginPage.checkError("Username `" + user.username() + "` already exists");
     }
 
     @Test

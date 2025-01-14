@@ -10,6 +10,7 @@ import guru.qa.niffler.page.PeoplePage;
 import org.junit.jupiter.api.Test;
 
 import static com.codeborne.selenide.Selenide.open;
+
 @WebTest
 public class FriendsWebTest {
 

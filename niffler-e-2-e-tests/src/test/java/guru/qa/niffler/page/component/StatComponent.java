@@ -19,8 +19,10 @@ public class StatComponent extends BaseComponent<StatComponent> {
     public StatComponent() {
         super($("#stat"));
     }
+
     private final ElementsCollection bubbles = self.$("#legend-container").$$("li");
     private final SelenideElement chart = $("canvas[role='img']");
+
     @Step("Get screenshot of stat chart")
     @Nonnull
     public BufferedImage chartScreenshot() throws IOException {

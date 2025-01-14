@@ -41,4 +41,15 @@ out/
 ### gRPC generated files ###
 /niffler-grpc-common/src/generated/**
 /niffler-e-2-e-tests/tmlog.lck
-/niffler-e-2-e-tests/tmlog1.log
+/niffler-e-2-e-tests/tmlog45.log
+/niffler-e-2-e-tests/tmlog47.log
+/niffler-e-2-e-tests/tmlog89.log
+/niffler-e-2-e-tests/tmlog100.log
+
+### allure ###
+/niffler-e-2-e-tests/allure-results/
+/hs_err_pid3552.log
+/hs_err_pid24116.log
+/hs_err_pid29632.log
+/replay_pid3552.log
+/replay_pid29632.log

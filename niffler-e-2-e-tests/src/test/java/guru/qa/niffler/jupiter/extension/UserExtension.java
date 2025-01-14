@@ -5,11 +5,7 @@ import guru.qa.niffler.model.rest.UserJson;
 import guru.qa.niffler.service.UsersClient;
 import guru.qa.niffler.service.impl.UsersDbClient;
 import guru.qa.niffler.utils.RandomDataUtils;
-import org.junit.jupiter.api.extension.BeforeEachCallback;
-import org.junit.jupiter.api.extension.ExtensionContext;
-import org.junit.jupiter.api.extension.ParameterContext;
-import org.junit.jupiter.api.extension.ParameterResolutionException;
-import org.junit.jupiter.api.extension.ParameterResolver;
+import org.junit.jupiter.api.extension.*;
 import org.junit.platform.commons.support.AnnotationSupport;
 
 public class UserExtension implements BeforeEachCallback, ParameterResolver {
@@ -26,10 +22,18 @@ public class UserExtension implements BeforeEachCallback, ParameterResolver {
                     if ("".equals(userAnno.username())) {
                         final String username = RandomDataUtils.randomUsername();
                         UserJson testUser = usersClient.createUser(username, defaultPassword);
-
-                        usersClient.addIncomeInvitation(testUser, userAnno.incomeInvitations());
-                        usersClient.addOutcomeInvitation(testUser, userAnno.outcomeInvitations());
-                        usersClient.addFriend(testUser, userAnno.friends());
+                        // Добавляем входящие приглашения, если их количество больше 0
+                        if (userAnno.incomeInvitations() > 0) {
+                            usersClient.addIncomeInvitation(testUser, userAnno.incomeInvitations());
+                        }
+                        // Добавляем исходящие приглашения, если их количество больше 0
+                        if (userAnno.outcomeInvitations() > 0) {
+                            usersClient.addOutcomeInvitation(testUser, userAnno.outcomeInvitations());
+                        }
+                        // Добавляем друзей, если их количество больше 0
+                        if (userAnno.friends() > 0) {
+                            usersClient.addFriend(testUser, userAnno.friends());
+                        }
                         setUser(testUser);
                     }
                 });
@@ -44,6 +48,7 @@ public class UserExtension implements BeforeEachCallback, ParameterResolver {
     public UserJson resolveParameter(ParameterContext parameterContext, ExtensionContext extensionContext) throws ParameterResolutionException {
         return getUserJson();
     }
+
     public static void setUser(UserJson testUser) {
         final ExtensionContext context = TestMethodContextExtension.context();
         context.getStore(NAMESPACE).put(
@@ -51,6 +56,7 @@ public class UserExtension implements BeforeEachCallback, ParameterResolver {
                 testUser
         );
     }
+
     public static UserJson getUserJson() {
         final ExtensionContext context = TestMethodContextExtension.context();
         return context.getStore(NAMESPACE).get(context.getUniqueId(), UserJson.class);

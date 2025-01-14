@@ -13,8 +13,10 @@ import static org.apache.commons.lang3.StringUtils.isNoneEmpty;
 import static org.apache.commons.lang3.StringUtils.substringBetween;
 
 public class AllureAppender extends StdoutLogger {
+
     private final String templateName = "sql-attachment.ftl";
     private final AttachmentProcessor<AttachmentData> attachmentProcessor = new DefaultAttachmentProcessor();
+
 
     @Override
     public void logSQL(int connectionId, String now, long elapsed, Category category, String prepared, String sql, String url) {

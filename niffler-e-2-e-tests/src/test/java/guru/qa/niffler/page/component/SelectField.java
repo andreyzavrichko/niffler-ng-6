@@ -18,6 +18,7 @@ public class SelectField extends BaseComponent<SelectField> {
         self.click();
         $$("li[role='option']").find(text(value)).click();
     }
+
     @Step("Check that selected value is equal to {value}")
     public void checkSelectValueIsEqualTo(String value) {
         self.shouldHave(text(value));

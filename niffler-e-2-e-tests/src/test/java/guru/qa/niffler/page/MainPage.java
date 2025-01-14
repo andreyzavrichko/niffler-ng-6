@@ -23,13 +23,13 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 public class MainPage extends BasePage<MainPage> {
 
     public static final String URL = CFG.frontUrl() + "main";
-    private final SelenideElement statisticCanvas = $("canvas[role='img']");
 
     protected final Header header = new Header();
     protected final SpendingTable spendingTable = new SpendingTable();
     protected final StatComponent statComponent = new StatComponent();
     // Коллекция всех ячеек статистики
     private final ElementsCollection statisticCells = $$("#legend-container li");
+    private final SelenideElement statisticCanvas = $("canvas[role='img']");
 
     @Nonnull
     public Header getHeader() {
@@ -37,15 +37,15 @@ public class MainPage extends BasePage<MainPage> {
     }
 
     @Nonnull
-    public StatComponent getStatComponent() {
-        statComponent.getSelf().scrollIntoView(true);
-        return statComponent;
-    }
-
-    @Nonnull
     public SpendingTable getSpendingTable() {
         spendingTable.getSelf().scrollIntoView(true);
         return spendingTable;
+    }
+
+    @Nonnull
+    public StatComponent getStatComponent() {
+        statComponent.getSelf().scrollIntoView(true);
+        return statComponent;
     }
 
     @Step("Check that page is loaded")

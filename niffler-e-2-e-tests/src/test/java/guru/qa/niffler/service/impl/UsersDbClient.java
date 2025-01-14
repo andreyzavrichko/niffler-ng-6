@@ -7,11 +7,11 @@ import guru.qa.niffler.data.entity.auth.AuthorityEntity;
 import guru.qa.niffler.data.entity.userdata.UserEntity;
 import guru.qa.niffler.data.repository.AuthUserRepository;
 import guru.qa.niffler.data.repository.UserdataUserRepository;
-import guru.qa.niffler.data.repository.impl.AuthUserRepositorySpringJdbc;
-import guru.qa.niffler.data.repository.impl.UserdataUserRepositorySpringJdbc;
+import guru.qa.niffler.data.repository.impl.AuthUserRepositoryJdbc;
+import guru.qa.niffler.data.repository.impl.UserdataUserRepositoryJdbc;
 import guru.qa.niffler.data.tpl.XaTransactionTemplate;
 import guru.qa.niffler.model.rest.CurrencyValues;
-import guru.qa.niffler.model.rest.FriendState;
+import guru.qa.niffler.model.rest.FriendshipStatus;
 import guru.qa.niffler.model.rest.TestData;
 import guru.qa.niffler.model.rest.UserJson;
 import guru.qa.niffler.service.UsersClient;
@@ -33,17 +33,17 @@ public class UsersDbClient implements UsersClient {
     private static final String defaultPassword = "12345";
     private static final PasswordEncoder pe = PasswordEncoderFactories.createDelegatingPasswordEncoder();
 
-    private final AuthUserRepository authUserRepository = new AuthUserRepositorySpringJdbc();
-    private final UserdataUserRepository userdataUserRepository = new UserdataUserRepositorySpringJdbc();
+    private final AuthUserRepository authUserRepository = new AuthUserRepositoryJdbc();
+    private final UserdataUserRepository userdataUserRepository = new UserdataUserRepositoryJdbc();
 
     private final XaTransactionTemplate xaTransactionTemplate = new XaTransactionTemplate(
             CFG.authJdbcUrl(),
             CFG.userdataJdbcUrl()
     );
 
+    @Step("Crete user using SQL")
     @Nonnull
     @Override
-    @Step("Create user using SQL")
     public UserJson createUser(String username, String password) {
         return requireNonNull(
                 xaTransactionTemplate.execute(
@@ -59,6 +59,7 @@ public class UsersDbClient implements UsersClient {
         );
     }
 
+    @Step("Add income invitations using SQL")
     @Override
     public void addIncomeInvitation(UserJson targetUser, int count) {
         if (count > 0) {
@@ -82,13 +83,14 @@ public class UsersDbClient implements UsersClient {
                                                         }
                                                 )
                                         ),
-                                        FriendState.INVITE_RECEIVED
+                                        FriendshipStatus.INVITE_RECEIVED
                                 )
                         );
             }
         }
     }
 
+    @Step("Add outcome invitations using SQL")
     @Override
     public void addOutcomeInvitation(UserJson targetUser, int count) {
         if (count > 0) {
@@ -112,13 +114,14 @@ public class UsersDbClient implements UsersClient {
                                                         }
                                                 )
                                         ),
-                                        FriendState.INVITE_RECEIVED
+                                        FriendshipStatus.INVITE_RECEIVED
                                 )
                         );
             }
         }
     }
 
+    @Step("Add friends using SQL")
     @Override
     public void addFriend(UserJson targetUser, int count) {
         if (count > 0) {
@@ -142,7 +145,7 @@ public class UsersDbClient implements UsersClient {
                                                         }
                                                 )
                                         ),
-                                        FriendState.FRIEND
+                                        FriendshipStatus.FRIEND
                                 )
                         );
             }

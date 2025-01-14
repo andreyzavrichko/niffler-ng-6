@@ -34,6 +34,7 @@ public abstract class RestClient {
     public RestClient(String baseUrl, boolean followRedirect, @Nullable Interceptor... interceptors) {
         this(baseUrl, followRedirect, JacksonConverterFactory.create(), HEADERS, interceptors);
     }
+
     public RestClient(String baseUrl, HttpLoggingInterceptor.Level loggingLevel) {
         this(baseUrl, false, JacksonConverterFactory.create(), loggingLevel, new Interceptor[0]);
     }
@@ -60,7 +61,7 @@ public abstract class RestClient {
             }
         }
         okHttpBuilder.addNetworkInterceptor(new HttpLoggingInterceptor().setLevel(loggingLevel));
-        okHttpBuilder.addNetworkInterceptor(new AllureOkHttp3());
+        okHttpBuilder.addNetworkInterceptor(new AllureOkHttp3().setRequestTemplate("request.ftl").setResponseTemplate("response.ftl"));
         okHttpBuilder.cookieJar(
                 new JavaNetCookieJar(
                         new CookieManager(

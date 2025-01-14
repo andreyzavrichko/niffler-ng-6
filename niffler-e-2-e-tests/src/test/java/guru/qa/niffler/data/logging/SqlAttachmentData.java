@@ -5,6 +5,7 @@ import lombok.Getter;
 
 @Getter
 public class SqlAttachmentData implements AttachmentData {
+
     private final String name;
     private final String sql;
 

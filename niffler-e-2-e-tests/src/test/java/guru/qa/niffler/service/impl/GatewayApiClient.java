@@ -87,5 +87,4 @@ public class GatewayApiClient extends RestClient {
         assertEquals(200, response.code()); // Проверяем, что HTTP-ответ имеет статус 200
         return response.body(); // Возвращаем тело ответа
     }
-
 }

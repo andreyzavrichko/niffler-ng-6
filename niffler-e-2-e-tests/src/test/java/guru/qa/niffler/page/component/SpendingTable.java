@@ -1,4 +1,5 @@
 package guru.qa.niffler.page.component;
+
 import com.codeborne.selenide.ElementsCollection;
 import com.codeborne.selenide.SelenideElement;
 import guru.qa.niffler.model.rest.DataFilterValues;
@@ -7,6 +8,7 @@ import guru.qa.niffler.page.EditSpendingPage;
 import io.qameta.allure.Step;
 
 import javax.annotation.Nonnull;
+
 import static com.codeborne.selenide.ClickOptions.usingJavaScript;
 import static com.codeborne.selenide.CollectionCondition.size;
 import static com.codeborne.selenide.Condition.text;
