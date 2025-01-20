@@ -17,6 +17,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -29,34 +30,45 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
 @ExtendWith(MockitoExtension.class)
 class UserServiceTest {
+
   private UserService userService;
+
   private final UUID mainTestUserUuid = UUID.randomUUID();
   private final String mainTestUserName = "dima";
   private UserEntity mainTestUser;
+
   private final UUID secondTestUserUuid = UUID.randomUUID();
   private final String secondTestUserName = "barsik";
   private UserEntity secondTestUser;
+
   private final UUID thirdTestUserUuid = UUID.randomUUID();
   private final String thirdTestUserName = "emma";
   private UserEntity thirdTestUser;
+
   private final String notExistingUser = "not_existing_user";
+
   @BeforeEach
   void init() {
     mainTestUser = new UserEntity();
     mainTestUser.setId(mainTestUserUuid);
     mainTestUser.setUsername(mainTestUserName);
     mainTestUser.setCurrency(CurrencyValues.RUB);
+
     secondTestUser = new UserEntity();
     secondTestUser.setId(secondTestUserUuid);
     secondTestUser.setUsername(secondTestUserName);
     secondTestUser.setCurrency(CurrencyValues.RUB);
+
     thirdTestUser = new UserEntity();
     thirdTestUser.setId(thirdTestUserUuid);
     thirdTestUser.setUsername(thirdTestUserName);
     thirdTestUser.setCurrency(CurrencyValues.RUB);
   }
+
+
   @ValueSource(strings = {
           "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAMAAABg3Am1AAACwVBMVEUanW4am2wBY0QYmWsMfFYBZEQAAQBHcEz+" +
                   "/v4AAAAZm20anW4bnW4IdFAanW4anW4BZUQbnm8bnm8anW4anG4VflganW4anW4Jd1Ibnm8EbEoDaUcbnW4anW4anW4bnm8anW4anW4" +
@@ -83,10 +95,14 @@ class UserServiceTest {
   void userShouldBeUpdated(String photo, @Mock UserRepository userRepository) {
     when(userRepository.findByUsername(eq(mainTestUserName)))
             .thenReturn(Optional.of(mainTestUser));
+
     when(userRepository.save(any(UserEntity.class)))
             .thenAnswer(answer -> answer.getArguments()[0]);
+
     userService = new UserService(userRepository);
+
     final String photoForTest = photo.isEmpty() ? null : photo;
+
     final UserJson toBeUpdated = new UserJson(
             null,
             mainTestUserName,
@@ -103,13 +119,17 @@ class UserServiceTest {
     assertEquals("Test TestSurname", result.fullname());
     assertEquals(CurrencyValues.USD, result.currency());
     assertEquals(photoForTest, result.photo());
+
     verify(userRepository, times(1)).save(any(UserEntity.class));
   }
+
   @Test
   void getRequiredUserShouldThrowNotFoundExceptionIfUserNotFound(@Mock UserRepository userRepository) {
     when(userRepository.findByUsername(eq(notExistingUser)))
             .thenReturn(Optional.empty());
+
     userService = new UserService(userRepository);
+
     final NotFoundException exception = assertThrows(NotFoundException.class,
             () -> userService.getRequiredUser(notExistingUser));
     assertEquals(
@@ -117,24 +137,31 @@ class UserServiceTest {
             exception.getMessage()
     );
   }
+
   @Test
   void allUsersShouldReturnCorrectUsersList(@Mock UserRepository userRepository) {
     when(userRepository.findByUsernameNot(eq(mainTestUserName)))
             .thenReturn(getMockUsersMappingFromDb());
+
     userService = new UserService(userRepository);
+
     final List<UserJsonBulk> users = userService.allUsers(mainTestUserName, null);
     assertEquals(2, users.size());
     final UserJsonBulk invitation = users.stream()
             .filter(u -> u.friendshipStatus() == INVITE_SENT)
             .findFirst()
             .orElseThrow(() -> new AssertionError("Friend with state INVITE_SENT not found"));
+
     final UserJsonBulk friend = users.stream()
             .filter(u -> u.friendshipStatus() == null)
             .findFirst()
             .orElseThrow(() -> new AssertionError("user without status not found"));
+
+
     assertEquals(secondTestUserName, invitation.username());
     assertEquals(thirdTestUserName, friend.username());
   }
+
   private List<UserWithStatus> getMockUsersMappingFromDb() {
     return List.of(
             new UserWithStatus(

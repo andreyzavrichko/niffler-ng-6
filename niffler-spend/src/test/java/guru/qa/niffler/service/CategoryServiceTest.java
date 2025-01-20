@@ -1,4 +1,5 @@
 package guru.qa.niffler.service;
+
 import guru.qa.niffler.data.CategoryEntity;
 import guru.qa.niffler.data.repository.CategoryRepository;
 import guru.qa.niffler.ex.CategoryNotFoundException;
@@ -27,19 +28,24 @@ import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
 class CategoryServiceTest {
+
     @Test
     void categoryNotFoundExceptionShouldBeThrown(@Mock CategoryRepository categoryRepository) {
         final String username = "not_found";
         final UUID id = UUID.randomUUID();
+
         Mockito.when(categoryRepository.findByUsernameAndId(eq(username), eq(id)))
                 .thenReturn(Optional.empty());
+
         CategoryService categoryService = new CategoryService(categoryRepository);
+
         CategoryJson categoryJson = new CategoryJson(
                 id,
                 "",
                 username,
                 true
         );
+
         CategoryNotFoundException ex = Assertions.assertThrows(
                 CategoryNotFoundException.class,
                 () -> categoryService.update(categoryJson)
@@ -49,23 +55,28 @@ class CategoryServiceTest {
                 ex.getMessage()
         );
     }
+
     @ValueSource(strings = {"Archived", "ARCHIVED", "ArchIved"})
     @ParameterizedTest
     void categoryNameArchivedShouldBeDenied(String catName, @Mock CategoryRepository categoryRepository) {
         final String username = "duck";
         final UUID id = UUID.randomUUID();
         final CategoryEntity cat = new CategoryEntity();
+
         Mockito.when(categoryRepository.findByUsernameAndId(eq(username), eq(id)))
                 .thenReturn(Optional.of(
                         cat
                 ));
+
         CategoryService categoryService = new CategoryService(categoryRepository);
+
         CategoryJson categoryJson = new CategoryJson(
                 id,
                 catName,
                 username,
                 true
         );
+
         InvalidCategoryNameException ex = Assertions.assertThrows(
                 InvalidCategoryNameException.class,
                 () -> categoryService.update(categoryJson)
@@ -75,6 +86,7 @@ class CategoryServiceTest {
                 ex.getMessage()
         );
     }
+
     @Test
     void onlyTwoFieldsShouldBeUpdated(@Mock CategoryRepository categoryRepository) {
         final String username = "duck";
@@ -84,19 +96,23 @@ class CategoryServiceTest {
         cat.setUsername(username);
         cat.setName("Магазины");
         cat.setArchived(false);
+
         Mockito.when(categoryRepository.findByUsernameAndId(eq(username), eq(id)))
                 .thenReturn(Optional.of(
                         cat
                 ));
         Mockito.when(categoryRepository.save(any(CategoryEntity.class)))
                 .thenAnswer(invocation -> invocation.getArgument(0));
+
         CategoryService categoryService = new CategoryService(categoryRepository);
+
         CategoryJson categoryJson = new CategoryJson(
                 id,
                 "Бары",
                 username,
                 true
         );
+
         categoryService.update(categoryJson);
         ArgumentCaptor<CategoryEntity> argumentCaptor = ArgumentCaptor.forClass(CategoryEntity.class);
         verify(categoryRepository).save(argumentCaptor.capture());
