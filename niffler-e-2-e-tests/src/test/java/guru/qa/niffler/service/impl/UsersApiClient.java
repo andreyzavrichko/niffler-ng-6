@@ -1,170 +1,138 @@
 package guru.qa.niffler.service.impl;
-
-import guru.qa.niffler.api.AuthApi;
-import guru.qa.niffler.api.UserdataApi;
+import guru.qa.niffler.api.SpendApi;
 import guru.qa.niffler.api.core.RestClient.EmptyClient;
-import guru.qa.niffler.api.core.ThreadSafeCookieStore;
 import guru.qa.niffler.config.Config;
-import guru.qa.niffler.model.rest.TestData;
-import guru.qa.niffler.model.rest.UserJson;
-import guru.qa.niffler.service.UsersClient;
-import io.qameta.allure.Step;
+import guru.qa.niffler.model.rest.CategoryJson;
+import guru.qa.niffler.model.rest.CurrencyValues;
+import guru.qa.niffler.model.rest.SpendJson;
+import guru.qa.niffler.service.SpendClient;
 import org.jetbrains.annotations.NotNull;
 import retrofit2.Response;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.io.IOException;
-import java.util.Collections;
 import java.util.List;
-
-import static guru.qa.niffler.utils.RandomDataUtils.randomUsername;
 import static java.util.Objects.requireNonNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-
 @ParametersAreNonnullByDefault
-public class UsersApiClient implements UsersClient {
-
+public class SpendApiClient implements SpendClient {
     private static final Config CFG = Config.getInstance();
-    private static final String defaultPassword = "12345";
-
-    private final AuthApi authApi = new EmptyClient(CFG.authUrl()).create(AuthApi.class);
-    private final UserdataApi userdataApi = new EmptyClient(CFG.userdataUrl()).create(UserdataApi.class);
-
-    @NotNull
+    private final SpendApi spendApi = new EmptyClient(CFG.spendUrl()).create(SpendApi.class);
     @Override
-    @Step("Crete user using API")
-    public UserJson createUser(String username, String password) {
-        try {
-            authApi.requestRegisterForm().execute();
-            authApi.register(
-                    username,
-                    password,
-                    password,
-                    ThreadSafeCookieStore.INSTANCE.cookieValue("XSRF-TOKEN")
-            ).execute();
-            UserJson createdUser = requireNonNull(userdataApi.currentUser(username).execute().body());
-            return createdUser.addTestData(
-                    new TestData(
-                            password
-                    )
-            );
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    @Step("Retrieve all users using API")
     @Nonnull
-    public List<UserJson> allUsers(@Nonnull String username, @Nullable String searchQuery) {
-        final Response<List<UserJson>> response;
+    public SpendJson createSpend(SpendJson spend) {
+        final Response<SpendJson> response;
         try {
-            response = userdataApi.allUsers(username, searchQuery)
+            response = spendApi.addSpend(spend)
+                    .execute();
+        } catch (IOException e) {
+            throw new AssertionError(e);
+        }
+        assertEquals(201, response.code());
+        return requireNonNull(response.body());
+    }
+    @Override
+    @Nonnull
+    public CategoryJson createCategory(CategoryJson category) {
+        final Response<CategoryJson> response;
+        try {
+            response = spendApi.addCategory(category)
                     .execute();
         } catch (IOException e) {
             throw new AssertionError(e);
         }
         assertEquals(200, response.code());
-        return response.body() != null
-                ? response.body()
-                : Collections.emptyList();
+        CategoryJson result = requireNonNull(response.body());
+        return category.archived()
+                ? updateCategory(
+                new CategoryJson(
+                        result.id(),
+                        result.name(),
+                        result.username(),
+                        true
+                )
+        ) : result;
     }
-
-    @Step("Retrieve all friends using API")
+    @Override
     @Nonnull
-    public List<UserJson> friends(@Nonnull String username, @Nullable String searchQuery) {
-        final Response<List<UserJson>> response;
+    public CategoryJson updateCategory(CategoryJson category) {
+        final Response<CategoryJson> response;
         try {
-            response = userdataApi.friends(username, searchQuery).execute();
+            response = spendApi.updateCategory(category)
+                    .execute();
         } catch (IOException e) {
             throw new AssertionError(e);
         }
         assertEquals(200, response.code());
-        return response.body() != null
-                ? response.body()
-                : Collections.emptyList();
+        return requireNonNull(response.body());
+    }
+    @Override
+    public void removeCategory(CategoryJson category) {
+        throw new UnsupportedOperationException("Can`t remove category using API");
     }
 
-    @Step("Add income invitations using API")
+    @NotNull
     @Override
-    public void addIncomeInvitation(UserJson targetUser, int count) {
-        if (count > 0) {
-            for (int i = 0; i < count; i++) {
-                final String username = randomUsername();
-                final Response<UserJson> response;
-                final UserJson newUser;
-                try {
-                    newUser = createUser(username, defaultPassword);
+    public CategoryJson getOrCreateCategory(String username, String categoryName, boolean archived) {
+        // Получаем все категории пользователя
+        List<CategoryJson> categories = getAllCategories(username);
 
-                    response = userdataApi.sendInvitation(
-                            newUser.username(),
-                            targetUser.username()
-                    ).execute();
-                } catch (IOException e) {
-                    throw new AssertionError(e);
-                }
-                assertEquals(200, response.code());
-
-                targetUser.testData()
-                        .incomeInvitations()
-                        .add(newUser);
-            }
-        }
+        // Проверяем, существует ли категория с указанным именем
+        return categories.stream()
+                .filter(category -> category.name().equals(categoryName))
+                .findFirst()
+                .orElseGet(() -> {
+                    // Если категории нет, создаем новую
+                    CategoryJson newCategory = new CategoryJson(null, categoryName, username, archived);
+                    return createCategory(newCategory);
+                });
     }
 
-    @Step("Add outcome invitations using API")
-    @Override
-    public void addOutcomeInvitation(UserJson targetUser, int count) {
-        if (count > 0) {
-            for (int i = 0; i < count; i++) {
-                final String username = randomUsername();
-                final Response<UserJson> response;
-                final UserJson newUser;
-                try {
-                    newUser = createUser(username, defaultPassword);
-
-                    response = userdataApi.sendInvitation(
-                            targetUser.username(),
-                            newUser.username()
-                    ).execute();
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-                assertEquals(200, response.code());
-
-                targetUser.testData()
-                        .outcomeInvitations()
-                        .add(newUser);
-            }
+    @Nonnull
+    public List<SpendJson> getAllSpends(String username, CurrencyValues filterCurrency, String from, String to) {
+        final Response<List<SpendJson>> response;
+        try {
+            response = spendApi.allSpends(username, filterCurrency, from, to)
+                    .execute();
+        } catch (IOException e) {
+            throw new AssertionError(e);
         }
+        assertEquals(200, response.code());
+        return requireNonNull(response.body());
     }
-
-    @Step("Add friends using API")
-    @Override
-    public void addFriend(UserJson targetUser, int count) {
-        if (count > 0) {
-            for (int i = 0; i < count; i++) {
-                final String username = randomUsername();
-                final Response<UserJson> response;
-                try {
-                    userdataApi.sendInvitation(
-                            createUser(
-                                    username,
-                                    defaultPassword
-                            ).username(),
-                            targetUser.username()
-                    ).execute();
-                    response = userdataApi.acceptInvitation(targetUser.username(), username).execute();
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-                assertEquals(200, response.code());
-
-                targetUser.testData()
-                        .friends()
-                        .add(response.body());
-            }
+    @Nonnull
+    public SpendJson getSpendById(String id) {
+        final Response<SpendJson> response;
+        try {
+            response = spendApi.getSpend(id)
+                    .execute();
+        } catch (IOException e) {
+            throw new AssertionError(e);
         }
+        assertEquals(200, response.code());
+        return requireNonNull(response.body());
+    }
+    public void removeSpends(String username, List<String> ids) {
+        final Response<Void> response;
+        try {
+            response = spendApi.removeSpends(username, ids)
+                    .execute();
+        } catch (IOException e) {
+            throw new AssertionError(e);
+        }
+        assertEquals(204, response.code());
+    }
+    @Nonnull
+    public List<CategoryJson> getAllCategories(String username) {
+        final Response<List<CategoryJson>> response;
+        try {
+            response = spendApi.allCategories(username)
+                    .execute();
+        } catch (IOException e) {
+            throw new AssertionError(e);
+        }
+        assertEquals(200, response.code());
+        return requireNonNull(response.body());
     }
 }
