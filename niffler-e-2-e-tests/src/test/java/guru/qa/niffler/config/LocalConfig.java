@@ -2,6 +2,7 @@ package guru.qa.niffler.config;
 
 
 import org.jetbrains.annotations.NotNull;
+
 import javax.annotation.Nonnull;
 
 enum LocalConfig implements Config {
@@ -65,10 +66,5 @@ enum LocalConfig implements Config {
     @Override
     public String currencyGrpcAddress() {
         return "127.0.0.1";
-    }
-    @Nonnull
-    @Override
-    public String ghUrl() {
-        return "https://api.github.com/";
     }
 }
