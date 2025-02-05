@@ -5,7 +5,6 @@
     <wsdl:types>
         <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified"
                    targetNamespace="niffler-userdata">
-
             <!-- REQUEST TYPES -->
             <xs:element name="updateUserRequest">
                 <xs:complexType>
@@ -14,7 +13,6 @@
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
-
             <xs:element name="currentUserRequest">
                 <xs:complexType>
                     <xs:sequence>
@@ -22,7 +20,6 @@
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
-
             <xs:element name="allUsersRequest">
                 <xs:complexType>
                     <xs:sequence>
@@ -31,7 +28,6 @@
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
-
             <xs:element name="allUsersPageRequest">
                 <xs:complexType>
                     <xs:sequence>
@@ -41,7 +37,6 @@
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
-
             <xs:element name="friendsRequest">
                 <xs:complexType>
                     <xs:sequence>
@@ -50,7 +45,6 @@
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
-
             <xs:element name="friendsPageRequest">
                 <xs:complexType>
                     <xs:sequence>
@@ -60,7 +54,6 @@
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
-
             <xs:element name="removeFriendRequest">
                 <xs:complexType>
                     <xs:sequence>
@@ -69,7 +62,6 @@
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
-
             <xs:element name="sendInvitationRequest">
                 <xs:complexType>
                     <xs:sequence>
@@ -78,7 +70,6 @@
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
-
             <xs:element name="acceptInvitationRequest">
                 <xs:complexType>
                     <xs:sequence>
@@ -87,7 +78,6 @@
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
-
             <xs:element name="declineInvitationRequest">
                 <xs:complexType>
                     <xs:sequence>
@@ -96,9 +86,7 @@
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
-
             <!-- RESPONSE TYPES -->
-
             <xs:element name="UserResponse">
                 <xs:complexType>
                     <xs:sequence>
@@ -106,7 +94,6 @@
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
-
             <xs:element name="UsersResponse">
                 <xs:complexType>
                     <xs:sequence>
@@ -117,9 +104,7 @@
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
-
             <!-- CUSTOM TYPES -->
-
             <xs:complexType name="user">
                 <xs:sequence>
                     <xs:element name="id" type="xs:string"/>
@@ -130,7 +115,7 @@
                     <xs:element name="currency" type="tns:currency"/>
                     <xs:element maxOccurs="1" minOccurs="0" name="photo" type="xs:string"/>
                     <xs:element maxOccurs="1" minOccurs="0" name="photoSmall" type="xs:string"/>
-                    <xs:element maxOccurs="1" minOccurs="0" name="friendState" type="tns:friendState"/>
+                    <xs:element maxOccurs="1" minOccurs="0" name="friendshipStatus" type="tns:friendshipStatus"/>
                 </xs:sequence>
             </xs:complexType>
 
@@ -141,7 +126,6 @@
                     <xs:element maxOccurs="unbounded" minOccurs="0" name="sort" type="tns:sort"/>
                 </xs:sequence>
             </xs:complexType>
-
             <xs:simpleType name="currency">
                 <xs:restriction base="xs:string">
                     <xs:enumeration value="RUB"/>
@@ -151,7 +135,7 @@
                 </xs:restriction>
             </xs:simpleType>
 
-            <xs:simpleType name="friendState">
+            <xs:simpleType name="friendshipStatus">
                 <xs:restriction base="xs:string">
                     <xs:enumeration value="INVITE_SENT"/>
                     <xs:enumeration value="INVITE_RECEIVED"/>
@@ -159,14 +143,12 @@
                     <xs:enumeration value="VOID"/>
                 </xs:restriction>
             </xs:simpleType>
-
             <xs:complexType name="sort">
                 <xs:sequence>
                     <xs:element minOccurs="1" name="property" type="xs:string"/>
                     <xs:element minOccurs="1" name="direction" type="tns:direction"/>
                 </xs:sequence>
             </xs:complexType>
-
             <xs:simpleType name="direction">
                 <xs:restriction base="xs:string">
                     <xs:enumeration value="ASC"/>
