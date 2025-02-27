@@ -1,6 +1,7 @@
 package guru.qa.niffler.config;
 
 import javax.annotation.Nonnull;
+import java.util.List;
 
 public interface Config {
 
@@ -48,4 +49,14 @@ public interface Config {
     default String ghUrl() {
         return "https://api.github.com/";
     }
+
+    @Nonnull
+    String kafkaAddress();
+
+    default List<String> kafkaTopics() {
+        return List.of("users");
+    }
+
+
+
 }
